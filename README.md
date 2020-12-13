@@ -1,6 +1,6 @@
 # COVID19 Dashboard in Japan
 
-COVID19 Dashboard in Japan, powered by Shiny web app, demonstrates interactive plots and summary to figure out how COVID19 had spread throughout Japan. 
+COVID19 Dashboard in Japan, powered by Shiny web app, demonstrates interactive plots and summary to figure out how COVID19 had spreaded throughout Japan. 
 The dataset is retrieved from [COVID-19 dataset in Japan in Kaggle](https://www.kaggle.com/lisphilar/covid19-dataset-in-japan)
  
 # DEMO
