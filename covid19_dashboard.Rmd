@@ -1,0 +1,387 @@
+---
+title: "COVID-19 Dashboard @Japan"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+
+# dashboard components
+library(flexdashboard)
+library(shiny)
+library(shinyWidgets)
+library(shinyjs)
+
+# Core
+library(tidyverse)
+library(tidyquant)
+
+# Interactive Visualizations
+library(plotly)
+library(choroplethr)
+library(choroplethrAdmin1)
+
+```
+
+```{r}
+
+# load the datasets
+covid_jpn_total      <- read_csv("00_data/covid_jpn_total.csv")
+covid_jpn_prefecture <- read_csv("00_data/covid_jpn_prefecture.csv")
+covid_jpn_metadata   <- read_csv("00_data/covid_jpn_metadata.csv")
+
+# date range
+# min(covid_jpn_total$Date)      
+# max(covid_jpn_total$Date)      
+# min(covid_jpn_prefecture$Date) 
+# max(covid_jpn_prefecture$Date) 
+
+# cleanse the datasets
+covid_jpn_metadata_tbl <- covid_jpn_metadata %>%
+  mutate(Key = str_glue("{Category}-{Item}")) %>% 
+  select(Prefecture, Value, Key) %>% 
+  spread(key = Key, value = Value) 
+  
+covid_jpn_prefecture_tbl <- covid_jpn_prefecture %>% 
+  left_join(covid_jpn_metadata_tbl, by = "Prefecture") %>% 
+  
+  select(Date, 
+         Prefecture, 
+         Positive, 
+         `Hospital_bed-Specific`, 
+         `Hospital_bed-Type-I`,
+         `Hospital_bed-Type-II`) %>% 
+  
+  rename(Specific      = `Hospital_bed-Specific`,
+         TypeI         = `Hospital_bed-Type-I`,
+         TypeII        = `Hospital_bed-Type-II`) %>% 
+  
+  mutate(Prefecture    = str_to_lower(Prefecture),
+         Specific      = as.numeric(Specific),
+         TypeI         = as.numeric(TypeI),
+         TypeII        = as.numeric(TypeII)) %>% 
+  
+  gather(key = "Type", value = "Value", Specific, TypeI, TypeII) %>%
+  mutate(Names = case_when(
+    Prefecture == "hokkaido"  ~ "北海道",
+    Prefecture == "aomori"    ~ "青森県",
+    Prefecture == "iwate"     ~ "岩手県",
+    Prefecture == "miyagi"    ~ "宮城県",
+    Prefecture == "akita"     ~ "秋田県",
+    Prefecture == "yamagata"  ~ "山形県",
+    Prefecture == "fukushima" ~ "福島県",
+    Prefecture == "ibaraki"   ~ "茨城県",
+    Prefecture == "tochigi"   ~ "栃木県",
+    Prefecture == "gunma"     ~ "群馬県",
+    Prefecture == "saitama"   ~ "埼玉県",
+    Prefecture == "chiba"     ~ "千葉県",
+    Prefecture == "tokyo"     ~ "東京都",
+    Prefecture == "kanagawa"  ~ "神奈川県",
+    Prefecture == "niigata"   ~ "新潟県",
+    Prefecture == "toyama"    ~ "富山県",
+    Prefecture == "ishikawa"  ~ "石川県",
+    Prefecture == "fukui"     ~ "福井県",
+    Prefecture == "yamanashi" ~ "山梨県",
+    Prefecture == "nagano"    ~ "長野県",
+    Prefecture == "gifu"      ~ "岐阜県",
+    Prefecture == "shizuoka"  ~ "静岡県",
+    Prefecture == "aichi"     ~ "愛知県",
+    Prefecture == "mie"       ~ "三重県",
+    Prefecture == "shiga"     ~ "滋賀県",
+    Prefecture == "kyoto"     ~ "京都府",
+    Prefecture == "osaka"     ~ "大阪府",
+    Prefecture == "hyogo"     ~ "兵庫県",
+    Prefecture == "nara"      ~ "奈良県",
+    Prefecture == "wakayama"  ~ "和歌山県",
+    Prefecture == "tottori"   ~ "鳥取県",
+    Prefecture == "shimane"   ~ "島根県",
+    Prefecture == "okayama"   ~ "岡山県",
+    Prefecture == "hiroshima" ~ "広島県",
+    Prefecture == "yamaguchi" ~ "山口県",
+    Prefecture == "tokushima" ~ "徳島県",
+    Prefecture == "kagawa"    ~ "香川県",
+    Prefecture == "ehime"     ~ "愛媛県",
+    Prefecture == "kochi"     ~ "高知県",
+    Prefecture == "fukuoka"   ~ "福岡県",
+    Prefecture == "saga"      ~ "佐賀県",
+    Prefecture == "nagasaki"  ~ "長崎県",
+    Prefecture == "kumamoto"  ~ "熊本県",
+    Prefecture == "oita"      ~ "大分県",
+    Prefecture == "miyazaki"  ~ "宮崎県",
+    Prefecture == "kagoshima" ~ "鹿児島県",
+    TRUE ~ "沖縄県"))
+  
+
+covid_jpn_total_tbl <- covid_jpn_total %>% 
+  filter(Date %>% between(left = min(covid_jpn_prefecture$Date), right = max(covid_jpn_prefecture$Date)))
+
+```
+
+Column {.sidebar}
+---------------------------------------------------------------
+
+```{r}
+useShinyjs(rmd = TRUE)
+
+dateRangeInput(
+  inputId = "date_range", 
+  label   = h5("日付選択"),
+  start   = min(covid_jpn_total_tbl$Date), 
+  end     = max(covid_jpn_total_tbl$Date), 
+  min     = min(covid_jpn_total_tbl$Date), 
+  max     = max(covid_jpn_total_tbl$Date), 
+  startview = "day")
+
+
+shinyWidgets::checkboxGroupButtons(
+  inputId   = "checkbox_category_1", 
+  label     = h5("検査内訳"), 
+  choices   = c("国内" = "Domestic", "空港検疫" = "Airport", "チャーター便帰国者" = "Returnee"),
+  selected  = unique(covid_jpn_total_tbl$Location), 
+  checkIcon = list(
+    yes = icon("ok", lib = "glyphicon"),
+    no  = icon("remove", lib = "glyphicon")
+  ))
+
+shinyWidgets::checkboxGroupButtons(
+  inputId   = "checkbox_category_2", 
+  label     = h5("感染症指定医療機関"), 
+  choices   = c("特定" = "Specific", "第一種" = "TypeI", "第二種" = "TypeII"),
+  selected  = unique(covid_jpn_prefecture_tbl$Type), 
+  checkIcon = list(
+    yes = icon("ok", lib = "glyphicon"),
+    no  = icon("remove", lib = "glyphicon")
+  ))
+
+br()
+hr()
+br()
+
+actionButton(inputId = "apply", label = "更新", icon = icon("play"),
+             style="color: white; background-color: green; border-color: black")
+
+actionButton(inputId = "reset", label = "リセット", icon = icon("sync"),
+             style="color: white; background-color: steelblue; border-color: black")
+
+observeEvent(eventExpr = input$reset, handlerExpr = {
+  
+  updateCheckboxGroupButtons(
+    session  = session, 
+    inputId  = "checkbox_category_1", 
+    selected = unique(covid_jpn_total_tbl$Location))
+  
+  updateCheckboxGroupButtons(
+    session  = session, 
+    inputId  = "checkbox_category_2", 
+    selected = unique(covid_jpn_prefecture_tbl$Type))
+  
+  updateDateRangeInput(
+    session = session, 
+    inputId = "date_range", 
+    start   = min(covid_jpn_total_tbl$Date), 
+    end     = max(covid_jpn_total_tbl$Date))
+  
+ shinyjs::delay(ms = 300, expr = {
+    
+    shinyjs::click(id = "apply")
+    
+  })
+  
+  
+})
+
+```
+
+```{r}
+covid_jpn_total_filtered_tbl <- eventReactive(
+
+  eventExpr = input$apply,
+  valueExpr = {
+
+    covid_jpn_total_tbl %>%
+      
+      filter(Date %>% between(left  = input$date_range[1],
+                              right = input$date_range[2])) %>%
+
+      filter(Location %in% input$checkbox_category_1)
+
+    },
+  ignoreNULL = FALSE
+)
+
+covid_jpn_prefecture_filtered_tbl <- eventReactive(
+
+  eventExpr = input$apply,
+  valueExpr = {
+
+    covid_jpn_prefecture_tbl %>%
+
+      filter(Date %in% input$date_range[2]) %>% 
+      
+      filter(Type %in% input$checkbox_category_2)
+
+    },
+  ignoreNULL = FALSE
+)
+
+```
+
+Row {data-height=150}
+---------------------------------------------------------------
+
+```{r}
+# compute the basic statistics
+summary_covid_jpn_total_tbl <- reactive({
+
+  covid_jpn_total_filtered_tbl() %>%
+    filter(Date == max(Date)) %>% 
+    summarise(Positive   = sum(Positive, na.rm = TRUE),
+              Tested     = sum(Tested, na.rm = TRUE),
+              Discharged = sum(Discharged, na.rm = TRUE),
+              Fatal      = sum(Fatal, na.rm = TRUE)) %>%
+    mutate(Positive      = Positive %>% scales::number(big.mark = ","),
+           Tested        = Tested %>% scales::number(big.mark = ","),
+           Discharged    = Discharged %>% scales::number(big.mark = ","),
+           Fatal         = Fatal %>% scales::number(big.mark = ","))
+})
+
+```
+
+
+### 検査数
+```{r}
+renderValueBox({
+
+  valueBox(value   = summary_covid_jpn_total_tbl()$Tested,
+           caption = "検査数",
+           icon    = "fa-vial",
+           color   = "success")
+})
+```
+
+### 陽性患者数
+```{r}
+renderValueBox({
+
+  valueBox(value   = summary_covid_jpn_total_tbl()$Positive,
+           caption = "陽性患者数",
+           icon    = "fa-bed",
+           color   = "warning")
+})
+```
+
+### 死者数
+```{r}
+renderValueBox({
+
+  valueBox(value   = summary_covid_jpn_total_tbl()$Fatal,
+           caption = "死者数",
+           icon    = "fa-skull",
+           color   = "danger")
+
+})
+```
+
+### 退院数
+```{r}
+renderValueBox({
+
+  valueBox(value   = summary_covid_jpn_total_tbl()$Discharged,
+           caption = "退院者数",
+           icon    = "fa-grin-tears",
+           color   = "primary")
+
+})
+```
+
+
+Row {data-height=850}
+---------------------------------------------------------------
+
+### 都道府県別：一病床あたりの陽性患者数
+
+```{r}
+
+geo_plot_tbl <- reactive({
+
+   covid_jpn_prefecture_filtered_tbl() %>%
+
+    group_by(Date, Prefecture, Names) %>%
+    summarise(Value    = sum(Value, na.rm = TRUE),
+              Positive = mean(Positive, na.rm = TRUE)) %>%
+    ungroup() %>%
+    mutate(Rate = Positive / Value %>% round(1)) %>%
+    mutate(Label_text = str_glue("{Names}: {Rate %>% round(1)}"))
+
+})
+
+```
+
+
+```{r}
+# define color
+
+output$plotly_1 <- renderPlotly(expr = {
+  
+  g <- admin1_choropleth(country.name  = "japan",
+                         df            = rename(geo_plot_tbl(), value = Rate, region = Prefecture),
+                         title         = "",
+                         legend        = "(人)",
+                         num_colors    = 1)
+  
+  ggplotly(g)
+  
+  })
+
+plotlyOutput(outputId = "plotly_1")
+
+
+```
+
+
+### 発症率の推移
+
+```{r}
+
+time_plot_tbl <- reactive({
+  
+  covid_jpn_total_filtered_tbl() %>%
+    
+    group_by(Date) %>% 
+    summarise(Positive    = sum(Positive, na.rm = TRUE),
+              Symptomatic = sum(Symptomatic, na.rm = TRUE)) %>% 
+    ungroup() %>% 
+    
+    mutate(Present_rate = Symptomatic / Positive,
+           Label_text   = str_glue("陽性患者数: {Positive}
+                                   有症状者数: {Symptomatic}
+                                   発症率: {scales::percent(Present_rate, accuracy = .1)}"))
+})
+
+output$plotly_2 <- renderPlotly({
+
+  g <- time_plot_tbl() %>%
+    ggplot(aes(Date, Present_rate)) +
+
+    geom_line(color = "#2c3e50") +
+    geom_point(aes(text = Label_text), color = "#2c3e50", size = .5) +
+    geom_smooth(method = "loess", span = 0.8) +
+
+    theme_tq() +
+    expand_limits(y = 0) +
+    scale_x_date(labels = scales::date_format("%m/%d")) +
+    scale_y_continuous(labels = scales::percent_format()) +
+    labs(x = "日付", y = "発症率")
+
+  ggplotly(g, tooltip = "text")
+
+})
+
+plotlyOutput(outputId = "plotly_2")
+
+  
+```
+
