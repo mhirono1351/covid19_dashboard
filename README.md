@@ -5,7 +5,7 @@ The dataset is retrieved from [COVID-19 dataset in Japan in Kaggle](https://www.
  
 ## DEMO
 ![covid19_demo](https://user-images.githubusercontent.com/63854101/102008839-b6f6e080-3d76-11eb-8378-38b3fd00911b.PNG)
-![Link to live dashboard](https://mhirono1351.shinyapps.io/covid19_dashboard/)
+[Link to live dashboard](https://mhirono1351.shinyapps.io/covid19_dashboard/)
  
 ## Features
 * Reactive data filters
