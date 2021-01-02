@@ -6,7 +6,7 @@ The dataset is retrieved from [COVID-19 dataset in Japan in Kaggle](https://www.
 
 ## General Info
 Like other nations, Japan has been struggling with unprecedented battle over infectious disease since Feb 2020. The news media broadcasts daunting reports/figures from various perspectives almost every day. Should we take them at face value? Any missing part from their perspective? That is my first motivation to drive me to develop this web application.
-By leveraging the public dataset, this Shiny-powered web application helps even non-experts intuitively understand how we are affected by COVID-19 from the different viewpoint than the new media. 
+By leveraging the public dataset, this Shiny-powered web application helps even non-experts intuitively understand how we are affected by COVID-19 from the different aspect not shown by the new media.  
 
 ## DEMO
 Here is a working live demo: https://mhirono1351.shinyapps.io/covid19_dashboard/
