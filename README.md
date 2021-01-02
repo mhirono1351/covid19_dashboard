@@ -5,7 +5,7 @@ COVID-19 Dashboard in Japan, powered by Shiny web app, demonstrates interactive 
 The dataset is retrieved from [COVID-19 dataset in Japan in Kaggle](https://www.kaggle.com/lisphilar/covid19-dataset-in-japan)
 
 ## General Info
-Like other nations, Japan has been struggling with unprecedented battle over the infectious disease since Feb 2020. The news media broadcasts daunting reports/figures from various perspectives almost every day. Wait, take some moments. Should we take them at face value? Any missing part from their perspective? That is my first motivation to drive me to develop this web application.By leveraging the public dataset, this Shiny-powered web application helps even non-experts intuitively understand how we are affected by COVID-19 from the different aspect not shown by the news media.  
+Like other nations, Japan has been struggling with an unprecedented battle with the infectious disease since Feb 2020. The news media broadcasts daunting reports/figures from various perspectives daily. Think for a moment, should we take them at face value? Are there missing parts from their perspective? That is the main motivation which drove me to develop this web application.By leveraging the public dataset, this Shiny-powered web application helps even non-experts intuitively understand how we are affected by COVID-19 from the different aspects not shown by the news media.  
 
 ## Demo
 Here is a working live demo: https://mhirono1351.shinyapps.io/covid19_dashboard/
@@ -29,7 +29,7 @@ The dashboard is created by R (4.0.3) with the following relevant packages:
 
 ## Development
 Your contribution would be much appreciated. 
-To fix a bug or enhance an exisiting module, follow there steps:
+To fix a bug or enhance an existing module, follow these steps:
 
 * Fork the repo
 * Create a new branch (`git checkout -b improve-feature`)
