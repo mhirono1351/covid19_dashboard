@@ -1,4 +1,4 @@
-![GIF 2021-01-02 20-32-44](https://user-images.githubusercontent.com/63854101/103456485-3e15f380-4d3a-11eb-8a86-da75130c6f91.gif)
+![GIF 2021-01-02 20-45-00](https://user-images.githubusercontent.com/63854101/103456718-30616d80-4d3c-11eb-921b-a74b5d272c39.gif)
 
 ## COVID-19 Dashboard in Japan
 COVID-19 Dashboard in Japan, powered by Shiny web app, demonstrates interactive plots and summary to figure out how COVID-19 had spread throughout Japan. 
