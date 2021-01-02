@@ -10,6 +10,11 @@ The dataset is retrieved from [COVID-19 dataset in Japan in Kaggle](https://www.
 ## DEMO
 Here is a working live demo: https://mhirono1351.shinyapps.io/covid19_dashboard/
 
+## Features
+* Reactive data filters
+* Action button & observers
+* Event-driven interactive outputs
+
 ## Technologies
 The dashboard is created by R (4.0.3) with the following relevant packages:
 * chorophlethr (3.7.0)
@@ -21,11 +26,6 @@ The dashboard is created by R (4.0.3) with the following relevant packages:
 * shinyWidgets (0.5.4)
 * tidyquant (1.0.2)
 * tidyverse (1.3.0)
- 
-## Features
-* Reactive data filters
-* Action button & observers
-* Event-driven interactive outputs
 
 ## Development
 Your contribution would be much appreciated. 
