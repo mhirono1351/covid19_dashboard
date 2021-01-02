@@ -13,7 +13,7 @@ Here is a working live demo: https://mhirono1351.shinyapps.io/covid19_dashboard/
 ## Features
 * Reactive data filters of date, the breakdown of testing, and types of hospitals
 * 4 panels of the summary including the total testing, positive cases, death, and out-hospital
-* 2 event-driven interactive plots demonstrating the positive cases per hospital bed, and transition of the prevalence rate
+* 2 event-driven interactive plots of the positive cases per hospital bed, and transition of the prevalence rate
 
 ## Technologies
 The dashboard is created by R (4.0.3) with the following relevant packages:
