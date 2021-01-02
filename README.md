@@ -1,19 +1,20 @@
 [gif file]
 
-## COVID19 Dashboard in Japan
-COVID19 Dashboard in Japan, powered by Shiny web app, demonstrates interactive plots and summary to figure out how COVID19 had spread throughout Japan. 
+## COVID-19 Dashboard in Japan
+COVID-19 Dashboard in Japan, powered by Shiny web app, demonstrates interactive plots and summary to figure out how COVID-19 had spread throughout Japan. 
 The dataset is retrieved from [COVID-19 dataset in Japan in Kaggle](https://www.kaggle.com/lisphilar/covid19-dataset-in-japan)
 
 ## General Info
-
+Like other nations, Japan has been struggling with unprecedented battle over infectious disease since Feb 2020. The news media broadcasts daunting reports/figures from various perspectives almost every day. Should we take them at face value? Any missing part from their perspective? That is my first motivation to drive me to develop this web application.
+By leveraging the public dataset, this Shiny-powered web application helps even non-experts intuitively understand how we are affected by COVID-19 from the different viewpoint than the new media. 
 
 ## DEMO
 Here is a working live demo: https://mhirono1351.shinyapps.io/covid19_dashboard/
 
 ## Features
-* Reactive data filters
-* Action button & observers
-* Event-driven interactive outputs
+* Reactive data filters of date, the breakdown of testing, and types of hospitals
+* 4 panels of the case summary including the total testing, positive cases, death, and out-hospital
+* 2 event-driven interactive plots demonstrating the positive cases per hospital bed, and transition of the prevalence rate
 
 ## Technologies
 The dashboard is created by R (4.0.3) with the following relevant packages:
